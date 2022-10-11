@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 
+import org.graalvm.compiler.replacements.Log;
+
 import java.util.Iterator;
 
 public class AstronautGame extends ApplicationAdapter {
@@ -37,6 +39,9 @@ public class AstronautGame extends ApplicationAdapter {
     private long lastTorpedoTime;
     private int shellsCollectedScore;
     private int subHealth;    // starts with 100
+    private Sound sharkSound;
+    private long lastSharkSoundTime;
+    private Sound hitSound;
 
 
     public BitmapFont font;
@@ -47,8 +52,9 @@ public class AstronautGame extends ApplicationAdapter {
     private static int SPEED_SHARK = 100;    // pixels per second
     private static int SPEED_TORPEDO = 300;
     private static final long CREATE_SHELL_TIME = 1000000000;    // ns
-    private static final long CREATE_SHARK_TIME = 2000000000;// ns
-    private static final long FIRE_TORPEDO_TIME = 300000000; // * 100
+    private static long CREATE_SHARK_TIME = 2000000000;// ns
+    private static final long FIRE_TORPEDO_TIME = 2000000000;
+    private static final long SHARK_SOUND_LENGTH = 1000000000;
 
     @Override
     public void create() {
@@ -64,6 +70,8 @@ public class AstronautGame extends ApplicationAdapter {
         shellSound = Gdx.audio.newSound(Gdx.files.internal("pick.wav"));
         bgImage = new Texture(Gdx.files.internal("sea.png"));
         torpedoImage = new Texture(Gdx.files.internal("torpedo.png"));
+        sharkSound = Gdx.audio.newSound(Gdx.files.internal("eat.mp3"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
@@ -94,6 +102,9 @@ public class AstronautGame extends ApplicationAdapter {
         // clear screen
         Gdx.gl.glClearColor(0.3f,0.1f, 0.9f, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+            batch.draw(bgImage, 0,0);
+        batch.end();
 
         // process user input
         if (Gdx.input.isTouched()) commandTouched();    // mouse or touch screen
@@ -116,8 +127,11 @@ public class AstronautGame extends ApplicationAdapter {
                 shark.y -= SPEED_SHARK * Gdx.graphics.getDeltaTime();
                 if (shark.y + sharkImage.getHeight() < 0) it.remove();
                 if (shark.overlaps(sub)) {
-                    shellSound.play();
                     subHealth--;
+                    if(TimeUtils.nanoTime() - lastSharkSoundTime > SHARK_SOUND_LENGTH){
+                        sharkSound.play();
+                        lastSharkSoundTime = TimeUtils.nanoTime();
+                    }
                 }
             }
 
@@ -128,14 +142,19 @@ public class AstronautGame extends ApplicationAdapter {
                 if (shell.overlaps(sub)) {
                     shellSound.play();
                     shellsCollectedScore++;
-                    if (shellsCollectedScore % 10 == 0) SPEED_SHARK += 66;    // speeds up
+                    if (shellsCollectedScore % 10 == 0) {
+                        SPEED_SHARK += 40;
+                        if(CREATE_SHARK_TIME > 1000000){
+                            CREATE_SHARK_TIME -= 100000000;
+                        }
+
+                    }    // speeds up
                     it.remove();    // smart Array enables remove from Array
                 }
             }
             for (Iterator<Rectangle> it = torpedos.iterator(); it.hasNext(); ) {
                 Rectangle torpedo = it.next();
                 torpedo.y += SPEED_TORPEDO * Gdx.graphics.getDeltaTime();
-                //TODO remove if top of screen
                 if(torpedo.y >  Gdx.graphics.getHeight()) {
                     it.remove();
                     continue;
@@ -145,7 +164,7 @@ public class AstronautGame extends ApplicationAdapter {
                     if (torpedo.overlaps(shark)) {
                         it.remove();
                         itshark.remove();
-                        //TODO play sound
+                        hitSound.play();
                     }
                 }
             }
@@ -204,7 +223,7 @@ public class AstronautGame extends ApplicationAdapter {
     }
 
     private void spawnTorpedo(){
-        if (TimeUtils.nanoTime() - lastTorpedoTime > FIRE_TORPEDO_TIME*10){
+        if (TimeUtils.nanoTime() - lastTorpedoTime > FIRE_TORPEDO_TIME){
             Rectangle torpedo= new Rectangle();
             torpedo.x = sub.x + subImage.getWidth()/2;
             torpedo.y = sub.y + subImage.getHeight()/2;
