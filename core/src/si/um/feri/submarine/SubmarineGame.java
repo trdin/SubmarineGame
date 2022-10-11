@@ -1,4 +1,4 @@
-package si.um.feri.astronaut;
+package si.um.feri.submarine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -17,11 +17,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 
-import org.graalvm.compiler.replacements.Log;
-
 import java.util.Iterator;
 
-public class AstronautGame extends ApplicationAdapter {
+public class SubmarineGame extends ApplicationAdapter {
     private Texture shellImage;
     private Texture subImage;
     private Texture sharkImage;

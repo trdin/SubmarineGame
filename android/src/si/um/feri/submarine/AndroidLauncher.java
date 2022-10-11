@@ -1,16 +1,15 @@
-package si.um.feri.astronaut;
+package si.um.feri.submarine;
 
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import si.um.feri.astronaut.AstronautGame;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new AstronautGame(), config);
+		initialize(new SubmarineGame(), config);
 	}
 }
