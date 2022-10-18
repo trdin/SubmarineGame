@@ -105,21 +105,25 @@ public class SubmarineGame extends ApplicationAdapter {
         batch.end();
 
         // process user input
-        if (Gdx.input.isTouched()) commandTouched();    // mouse or touch screen
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) commandMoveLeft();
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) commandMoveRight();
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) commandMoveLeftCorner();
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) commandMoveRightCorner();
+
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) commandExitGame();
 
-        // check if we need to create a new astronaut/asteroid
-        if (TimeUtils.nanoTime() - lastShellTime > CREATE_SHELL_TIME) spawnShell();
-        if (TimeUtils.nanoTime() - lastSharkTime > CREATE_SHARK_TIME) spawnShark();
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) spawnTorpedo();
+
 
         if (subHealth > 0) {    // is game end?
             // move and remove any that are beneath the bottom edge of
             // the screen or that hit the rocket
+            if (Gdx.input.isTouched()) commandTouched();    // mouse or touch screen
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) commandMoveLeft();
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) commandMoveRight();
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) commandMoveLeftCorner();
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) commandMoveRightCorner();
+
+            // check if we need to create a new astronaut/asteroid
+            if (TimeUtils.nanoTime() - lastShellTime > CREATE_SHELL_TIME) spawnShell();
+            if (TimeUtils.nanoTime() - lastSharkTime > CREATE_SHARK_TIME) spawnShark();
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) spawnTorpedo();
+
             for (Iterator<Rectangle> it = sharks.iterator(); it.hasNext(); ) {
                 Rectangle shark = it.next();
                 shark.y -= SPEED_SHARK * Gdx.graphics.getDeltaTime();
