@@ -161,7 +161,7 @@ public class World {
             }
         }
     }
-
+//TODO fix this in seperate classes
     private void renderTorpedos() {
         for (Iterator<Torpedo> it = torpedos.iterator(); it.hasNext(); ) {
             Torpedo torpedo = it.next();
