@@ -21,6 +21,10 @@ class Shark(
     var angle = MathUtils.random(0f, 360f)
 
     var sideSpeed = MathUtils.random(0, 2)
+    init{
+        width *=scale;
+        height *=scale;
+    }
 
     //var speed = 100
     fun update() {
@@ -65,8 +69,8 @@ class Shark(
             angle,
             0,
             0,
-            width.toInt(),
-            height.toInt(),
+            image.width,
+            image.height,
             turn,
             false
         );

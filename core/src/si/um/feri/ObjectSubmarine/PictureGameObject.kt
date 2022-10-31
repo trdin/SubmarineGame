@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Rectangle ;
 open class PictureGameObject(
     x: Float,
     y: Float,
-    var image: Texture
+    var image: Texture,
     ) : Rectangle(x, y, image.width.toFloat(), image.height.toFloat()) {
 
     open fun draw(batch: SpriteBatch){

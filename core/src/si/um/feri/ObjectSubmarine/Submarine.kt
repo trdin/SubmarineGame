@@ -8,9 +8,10 @@ class Submarine(
     x: Float,
     y: Float,
     var health : Int,
-    var speed: Int,
     image : Texture
 ) : PictureGameObject(x, y, image) {
+
+    var speed = 600;
 
     init{
         super.x -= image.width/2f

@@ -54,7 +54,7 @@ public class RoolWheel extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.5f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-            ///batch.draw(wheelImage, x ,y);
+        ///batch.draw(wheelImage, x ,y);
         batch.draw(
                 wheelImage,
                 x,
@@ -75,20 +75,18 @@ public class RoolWheel extends ApplicationAdapter {
         );
         batch.end();
 
-        if(right){
+        if (right) {
             x += speed;
-            angle -= (int) (speed * 360/(2*3.14*wheelImage.getWidth()/2f));
-        }else{
-            x-=speed;
-            angle += (int) (speed * 360/(2*3.14*wheelImage.getWidth()/2f));
+            angle -= (int) (speed * 360 / (2 * 3.14 * wheelImage.getWidth() / 2f));
+        } else {
+            x -= speed;
+            angle += (int) (speed * 360 / (2 * 3.14 * wheelImage.getWidth() / 2f));
         }
         if (x < 0) {
             right = true;
         } else if (x + wheelImage.getWidth() > Gdx.graphics.getWidth()) {
             right = false;
         }
-
-
 
 
     }

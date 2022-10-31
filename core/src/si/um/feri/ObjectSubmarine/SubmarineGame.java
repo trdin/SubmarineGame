@@ -10,11 +10,13 @@ import com.badlogic.gdx.Input;
 public class SubmarineGame extends ApplicationAdapter {
 
     private World world;
+    private WorldRender worldRender;
 
     @Override
     public void create() {
         world = new World();
         world.create();
+        worldRender = new WorldRender(world);
     }
 
 
@@ -41,7 +43,7 @@ public class SubmarineGame extends ApplicationAdapter {
 
             if (Gdx.input.isKeyPressed(Input.Keys.UP)) world.spawnTorpedo();
 
-            world.renderObjects();
+            worldRender.renderObjects();
 
         } else {    // health of rocket is 0 or less
             world.endGame();
