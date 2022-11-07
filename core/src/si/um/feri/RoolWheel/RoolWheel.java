@@ -30,8 +30,6 @@ public class RoolWheel extends ApplicationAdapter {
 
     @Override
     public void create() {
-
-
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch = new SpriteBatch();

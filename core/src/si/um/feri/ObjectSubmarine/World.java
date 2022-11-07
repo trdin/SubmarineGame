@@ -1,22 +1,14 @@
 package si.um.feri.ObjectSubmarine;
 
-import static java.sql.DriverManager.println;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-
-import java.util.Iterator;
 
 public class World {
     private SpriteBatch batch;
@@ -24,12 +16,14 @@ public class World {
     Submarine sub;
     Array<Shell> shells;    // special LibGDX Array
     Array<Shark> sharks;
-    Array<Torpedo> torpedos;
+    Array<Torpedo> torpedoes;
+    Array<PowerUp> powerUps;
     long lastShellTime;
     long lastSharkTime;
     private long lastTorpedoTime;
     int shellsCollectedScore;
     long lastSharkSoundTime;
+    long lastPowerUpTime;
 
     public BitmapFont font;
 
@@ -45,11 +39,14 @@ public class World {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch = new SpriteBatch();
 
-        sub = new Submarine(Gdx.graphics.getWidth() / 2f, 20, 100, Assets.subImage);
+        sub = new Submarine();
 
         shells = new Array<Shell>();
         sharks = new Array<Shark>();
-        torpedos = new Array<Torpedo>();
+        torpedoes = new Array<Torpedo>();
+        powerUps = new Array<PowerUp>();
+
+        lastPowerUpTime = TimeUtils.nanoTime();
         spawnShell();
         spawnShark();
     }
@@ -74,36 +71,48 @@ public class World {
             for (Shell shell : shells) {
                 shell.draw(batch);
             }
-            for (Torpedo torpedo : torpedos) {
+            for (Torpedo torpedo : torpedoes) {
                 torpedo.draw(batch);
+            }
+            for(PowerUp powerUp: powerUps){
+                powerUp.draw(batch);
             }
             font.setColor(Color.YELLOW);
             font.draw(batch, "" + shellsCollectedScore, Gdx.graphics.getWidth() - 50, Gdx.graphics.getHeight() - 20);
             font.setColor(Color.GREEN);
             font.draw(batch, "" + sub.getHealth(), 20, Gdx.graphics.getHeight() - 20);
 
-            if (TimeUtils.nanoTime() - lastTorpedoTime > Assets.FIRE_TORPEDO_TIME) {
-                batch.draw(Assets.torpedoImage,Gdx.graphics.getWidth() - 45, Gdx.graphics.getHeight() - 100, Assets.torpedoImage.getWidth(), Assets.torpedoImage.getHeight());
+            if (sub.getPower()) {
+                batch.draw(Assets.torpedoImage, Gdx.graphics.getWidth() - 45, Gdx.graphics.getHeight() - 100, Assets.torpedoImage.getWidth(), Assets.torpedoImage.getHeight());
             }
         }
         batch.end();
     }
 
     public void spawnTorpedo() {
+        if(sub.getPower() &&  TimeUtils.nanoTime() - lastPowerUpTime > Assets.POWER_UP_LENGTH*3){
+            sub.setPower(false);
+        }
 
-        if (TimeUtils.nanoTime() - lastTorpedoTime > Assets.FIRE_TORPEDO_TIME) {
-            torpedos.add(new Torpedo(sub.x +  Assets.subImage.getWidth() / 2f, sub.y +  Assets.subImage.getHeight() / 2f,  Assets.torpedoImage));
+        if (sub.getPower() && TimeUtils.nanoTime() - lastTorpedoTime > 100000000 ) {
+            torpedoes.add(Torpedo.Companion.create(sub.x + Assets.subImage.getWidth() / 2f, sub.y + Assets.subImage.getHeight() / 2f));
             lastTorpedoTime = TimeUtils.nanoTime();
         }
     }
 
+    public void spawnPowerUp() {
+        powerUps.add(PowerUp.Companion.getPOOL_POWER_UPS().obtain());
+        lastPowerUpTime = TimeUtils.nanoTime();
+        Assets.POWER_UP_TIME += 10000000;
+    }
+
     public void spawnShell() {
-        shells.add(new Shell( Assets.shellImage));
+        shells.add(Shell.Companion.getPOOL_SHELLS().obtain());
         lastShellTime = TimeUtils.nanoTime();
     }
 
     public void spawnShark() {
-        sharks.add(new Shark(MathUtils.random(Assets.LOW_SPEED_SHARK, Assets.TOP_SPEED_SHARK),  Assets.sharkImage));
+        sharks.add(Shark.Companion.getPOOL_SHARKS().obtain());
         lastSharkTime = TimeUtils.nanoTime();
     }
 
@@ -111,7 +120,7 @@ public class World {
         Gdx.gl.glClearColor(0.3f, 0.1f, 0.9f, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        batch.draw( Assets.bgImage, 0, 0);
+        batch.draw(Assets.bgImage, 0, 0);
         batch.end();
     }
 
@@ -119,7 +128,7 @@ public class World {
         Vector3 touchPos = new Vector3();
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(touchPos); // transform the touch/mouse coordinates to our camera's coordinate system
-        sub.x = touchPos.x -  Assets.subImage.getWidth() / 2f;
+        sub.x = touchPos.x - Assets.subImage.getWidth() / 2f;
     }
 
     public void dispose() {
@@ -132,8 +141,32 @@ public class World {
         batch.begin();
         {
             font.setColor(Color.RED);
-            font.draw(batch, "The END", Gdx.graphics.getHeight() / 2f, Gdx.graphics.getHeight() / 2f);
+            font.draw(batch, "The END", Gdx.graphics.getHeight() / 2f - 25, Gdx.graphics.getHeight() / 2f + 25);
+            font.draw(batch, "To reset press R", Gdx.graphics.getHeight() / 2f - 50, Gdx.graphics.getHeight() / 2f - 25);
         }
         batch.end();
+        Assets.pause = true;
+    }
+
+    public void pause() {
+        batch.begin();
+        {
+            font.setColor(Color.RED);
+            font.draw(batch, "Paused", Gdx.graphics.getHeight() / 2f, Gdx.graphics.getHeight() / 2f);
+        }
+        batch.end();
+    }
+
+    public void reset() {
+        Assets.pause = false;
+        shellsCollectedScore = 0;
+
+        sub = new Submarine();
+
+        shells = new Array<Shell>();
+        sharks = new Array<Shark>();
+        torpedoes = new Array<Torpedo>();
+        spawnShell();
+        spawnShark();
     }
 }

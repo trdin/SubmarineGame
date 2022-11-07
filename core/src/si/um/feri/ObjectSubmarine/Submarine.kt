@@ -4,14 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
 
-class Submarine(
-    x: Float,
-    y: Float,
-    var health : Int,
-    image : Texture
-) : PictureGameObject(x, y, image) {
+class Submarine: PictureGameObject(Gdx.graphics.getWidth() / 2f, 20f, Assets.subImage) {
 
+    var health = 100;
     var speed = 600;
+    var power = false;
 
     init{
         super.x -= image.width/2f
@@ -35,6 +32,10 @@ class Submarine(
 
     fun commandMoveRightCorner() {
         x = (Gdx.graphics.width - width).toFloat()
+    }
+
+    fun powerUp(){
+        power = true;
     }
 
     /*private void commandMoveLeft() {

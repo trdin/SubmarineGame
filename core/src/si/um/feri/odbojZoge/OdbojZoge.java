@@ -106,16 +106,14 @@ public class OdbojZoge extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.5f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-
-
-
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
         for (CircleColor circle : circles) {
-            renderer.begin(ShapeRenderer.ShapeType.Filled);
+
             renderer.setColor(circle.color);
             renderer.circle(circle.x, circle.y, circle.radius);
-            renderer.end();
             circle.update();
         }
+        renderer.end();
 
     }
 
