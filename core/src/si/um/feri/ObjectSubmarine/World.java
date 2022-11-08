@@ -161,6 +161,11 @@ public class World {
         Assets.pause = false;
         shellsCollectedScore = 0;
 
+        lastPowerUpTime = TimeUtils.nanoTime();
+        Assets.POWER_UP_TIME =  2000000000;
+        Assets.TOP_SPEED_SHARK = 150;
+        Assets.LOW_SPEED_SHARK = 50;
+
         sub = new Submarine();
 
         shells = new Array<Shell>();
@@ -168,5 +173,7 @@ public class World {
         torpedoes = new Array<Torpedo>();
         spawnShell();
         spawnShark();
+
+
     }
 }
