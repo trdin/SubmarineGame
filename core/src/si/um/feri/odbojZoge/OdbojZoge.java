@@ -122,7 +122,7 @@ public class OdbojZoge extends ApplicationAdapter {
      */
     @Override
     public void dispose() {
-
+        renderer.dispose();
     }
 
     public void commandTouched() {
@@ -137,6 +137,7 @@ public class OdbojZoge extends ApplicationAdapter {
     }
 
     private void commandExitGame() {
+        dispose();
         Gdx.app.exit();
     }
 }

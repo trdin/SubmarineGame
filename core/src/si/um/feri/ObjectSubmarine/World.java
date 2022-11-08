@@ -167,10 +167,23 @@ public class World {
         Assets.LOW_SPEED_SHARK = 50;
 
         sub = new Submarine();
+        for (Shark shark : sharks) {
+            shark.free();
+        }
+        for (Shell shell : shells) {
+            shell.free();
+        }
+        for (Torpedo torpedo : torpedoes) {
+            torpedo.free();
+        }
+        for(PowerUp powerUp: powerUps){
+            powerUp.free();
+        }
 
         shells = new Array<Shell>();
         sharks = new Array<Shark>();
         torpedoes = new Array<Torpedo>();
+
         spawnShell();
         spawnShark();
 

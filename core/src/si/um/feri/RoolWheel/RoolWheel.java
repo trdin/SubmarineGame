@@ -95,7 +95,8 @@ public class RoolWheel extends ApplicationAdapter {
      */
     @Override
     public void dispose() {
-
+        batch.dispose();
+        wheelImage.dispose();
     }
 
   /*  public void commandTouched() {
@@ -110,6 +111,7 @@ public class RoolWheel extends ApplicationAdapter {
     }*/
 
     private void commandExitGame() {
+        dispose();
         Gdx.app.exit();
     }
 }
