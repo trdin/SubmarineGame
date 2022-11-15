@@ -1,5 +1,6 @@
 package si.um.feri.ObjectSubmarine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.Iterator;
@@ -13,6 +14,7 @@ public class WorldRender {
     }
 
     public void renderObjects() {
+
         renderShells();
         renderSharks();
         renderTorpedos();
@@ -83,7 +85,6 @@ public class WorldRender {
             }
         }
     }
-    //TODO fix this in seperate classes
     private void renderTorpedos() {
         for (Iterator<Torpedo> it = world.torpedoes.iterator(); it.hasNext(); ) {
             Torpedo torpedo = it.next();

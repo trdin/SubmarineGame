@@ -2,15 +2,16 @@ package si.um.feri.ObjectSubmarine
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Pool
 import com.badlogic.gdx.utils.Pools
 
 class Shark() : PictureGameObject(
     (MathUtils.random(0, Gdx.graphics.getWidth() - Assets.sharkImage.getWidth())).toFloat(),
-    Gdx.graphics.getHeight().toFloat(),  Assets.sharkImage
+    Gdx.graphics.getHeight().toFloat(), Assets.sharkImage
 ), Pool.Poolable {
-    companion object{
+    companion object {
         val POOL_SHARKS: Pool<Shark> = Pools.get(Shark::class.java, 10)
     }
 
@@ -22,12 +23,15 @@ class Shark() : PictureGameObject(
     var angle = MathUtils.random(0f, 360f)
 
     var sideSpeed = MathUtils.random(0, 2)
-    init{
-        width *=scale;
-        height *=scale;
+
+    init {
+        width *= scale;
+        height *= scale;
     }
 
-    fun free(){ POOL_SHARKS.free(this)}
+    fun free() {
+        POOL_SHARKS.free(this)
+    }
 
     override fun reset() {
         turnSpeed = MathUtils.random(0f, 5f)
@@ -40,8 +44,8 @@ class Shark() : PictureGameObject(
         x = MathUtils.random(0, Gdx.graphics.getWidth() - width.toInt()).toFloat()
         y = Gdx.graphics.getHeight().toFloat()
 
-        width *=scale;
-        height *=scale;
+        width *= scale;
+        height *= scale;
     }
 
     //var speed = 100
@@ -68,7 +72,7 @@ class Shark() : PictureGameObject(
     override fun draw(batch: SpriteBatch) {
         //batch.draw(image, x, y, width / 2, height / 2, width, height)
         //batch.draw(super.image, x, y, width / 2, height / 2, width, height, scale, scale, 0f)
-        if(!Assets.pause) {
+        if (!Assets.pause) {
             if (turn) {
                 angle += turnSpeed
             } else {
@@ -94,6 +98,20 @@ class Shark() : PictureGameObject(
             turn,
             false
         );
+    }
+
+    override fun drawDebug(shapeRenderer: ShapeRenderer) {
+        shapeRenderer.rect(
+            x,
+            y,
+            width / 2,
+            height / 2,
+            width,
+            height,
+            scale,
+            scale,
+            angle
+        )
     }
 
 }

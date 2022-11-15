@@ -5,10 +5,21 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+
+import si.um.feri.util.ViewportUtils;
+import si.um.feri.util.debug.DebugCameraController;
+import si.um.feri.util.debug.MemoryInfo;
+//TODO fix  odboj shell powerup ??
+//TODO  rotate shape shark
 
 public class World {
     private SpriteBatch batch;
@@ -27,10 +38,17 @@ public class World {
 
     public BitmapFont font;
 
+    DebugCameraController debugCameraController;
+    MemoryInfo memoryInfo;
+    boolean debug = false;
+
+    private ShapeRenderer shapeRenderer;
+    public Viewport viewport;
+
 
     public void create() {
         font = new BitmapFont();
-        font.getData().setScale(3);
+        font.getData().setScale(2);
         shellsCollectedScore = 0;
         Assets.load();
 
@@ -38,6 +56,15 @@ public class World {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch = new SpriteBatch();
+
+        // debug
+        debugCameraController = new DebugCameraController();
+        debugCameraController.setStartPosition(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
+        memoryInfo = new MemoryInfo(500);
+
+        shapeRenderer = new ShapeRenderer();
+        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+
 
         sub = new Submarine();
 
@@ -87,6 +114,60 @@ public class World {
             }
         }
         batch.end();
+        if(debug){
+            drawDebug();
+        }
+    }
+
+    public void drawDebug(){
+        debugCameraController.applyTo(camera);
+        batch.begin();
+        {
+            // the average number of frames per second
+            GlyphLayout layout = new GlyphLayout(font, "FPS:" + Gdx.graphics.getFramesPerSecond());
+            font.setColor(Color.YELLOW);
+            font.draw(batch, layout, Gdx.graphics.getWidth() - layout.width, Gdx.graphics.getHeight() - 50);
+
+            // number of rendering calls, ever; will not be reset unless set manually
+            font.setColor(Color.YELLOW);
+            font.draw(batch, "RC:" + batch.totalRenderCalls, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() - 20);
+
+            memoryInfo.render(batch, font);
+        }
+        batch.end();
+
+        batch.totalRenderCalls = 0;
+        ViewportUtils.drawGrid(viewport, shapeRenderer, 50);
+
+        // print rectangles
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        // https://libgdx.badlogicgames.com/ci/nightlies/docs/api/com/badlogic/gdx/graphics/glutils/ShapeRenderer.html
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        {
+            shapeRenderer.setColor(1, 1, 0, 1);
+           /* for (Rectangle asteroid : asteroids) {
+                shapeRenderer.rect(asteroid.x, asteroid.y, asteroidImage.getWidth(), asteroidImage.getHeight());
+            }
+            for (Rectangle astronaut : astronauts) {
+                shapeRenderer.rect(astronaut.x, astronaut.y, astronautImage.getWidth(), astronautImage.getHeight());
+            }
+            shapeRenderer.rect(rocket.x, rocket.y, rocketImage.getWidth(), rocketImage.getHeight());*/
+
+            for (Shark shark : sharks) {
+                shark.drawDebug(shapeRenderer);
+            }
+            for (Shell shell : shells) {
+                shell.drawDebug(shapeRenderer);
+            }
+            for (Torpedo torpedo : torpedoes) {
+                torpedo.drawDebug(shapeRenderer);
+            }
+            for(PowerUp powerUp: powerUps){
+                powerUp.drawDebug(shapeRenderer);
+            }
+            sub.drawDebug(shapeRenderer);
+        }
+        shapeRenderer.end();
     }
 
     public void spawnTorpedo() {
@@ -120,7 +201,7 @@ public class World {
         Gdx.gl.glClearColor(0.3f, 0.1f, 0.9f, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        batch.draw(Assets.bgImage, 0, 0);
+        batch.draw(Assets.bgImage, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.end();
     }
 

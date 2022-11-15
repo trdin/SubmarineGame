@@ -30,7 +30,7 @@ class Shell : PictureGameObject(
 
         if(x < 0 ){
             turn = true
-        }else if( x > Gdx.graphics.width){
+        }else if( x > Gdx.graphics.width - width){
             turn = false
         }
 

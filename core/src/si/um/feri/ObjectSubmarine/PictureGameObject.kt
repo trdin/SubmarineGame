@@ -2,6 +2,7 @@ package si.um.feri.ObjectSubmarine
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Rectangle ;
 
 open class PictureGameObject(
@@ -12,5 +13,9 @@ open class PictureGameObject(
 
     open fun draw(batch: SpriteBatch){
         batch.draw(image, x ,y)
+    }
+
+    open fun drawDebug(shapeRenderer: ShapeRenderer){
+        shapeRenderer.rect(x, y, width, height)
     }
 }

@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.utils.TimeUtils;
 
 
-//TODO sub image
 public class SubmarineGame extends ApplicationAdapter {
 
     private World world;
@@ -29,6 +28,13 @@ public class SubmarineGame extends ApplicationAdapter {
     public void render() {
         world.drawBg();
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) world.debug = !world.debug;
+
+        if (world.debug) {
+            world.debugCameraController.handleDebugInput(Gdx.graphics.getDeltaTime());
+            world.memoryInfo.update();
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) commandExitGame();
         if (Gdx.input.isKeyPressed(Input.Keys.P) && world.sub.getHealth() > 0) {
             if (TimeUtils.nanoTime() - lastKeypress > 100000000) {
@@ -45,8 +51,8 @@ public class SubmarineGame extends ApplicationAdapter {
                 if (Gdx.input.isTouched()) world.commandTouched();    // mouse or touch screen
                 if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) world.sub.commandMoveLeft();
                 if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) world.sub.commandMoveRight();
-                if (Gdx.input.isKeyPressed(Input.Keys.A)) world.sub.commandMoveLeftCorner();
-                if (Gdx.input.isKeyPressed(Input.Keys.S)) world.sub.commandMoveRightCorner();
+                //if (Gdx.input.isKeyPressed(Input.Keys.A)) world.sub.commandMoveLeftCorner();
+                //if (Gdx.input.isKeyPressed(Input.Keys.S)) world.sub.commandMoveRightCorner();
 
                 if (Gdx.input.isKeyPressed(Input.Keys.UP)) world.spawnTorpedo();
 
