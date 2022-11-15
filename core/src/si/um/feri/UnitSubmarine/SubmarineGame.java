@@ -75,6 +75,9 @@ public class SubmarineGame extends ApplicationAdapter {
     private static final long FIRE_TORPEDO_TIME = 2000000000;
     private static final long SHARK_SOUND_LENGTH = 1000000000;
 
+    private DebugCameraController debugCameraController;
+    private boolean debug = false;
+
     @Override
     public void create() {
 
@@ -90,9 +93,9 @@ public class SubmarineGame extends ApplicationAdapter {
         shellsCollectedScore = 0;
         subHealth = 100;
 
-        /*debugCameraController = new DebugCameraController();
+        debugCameraController = new DebugCameraController();
         debugCameraController.setStartPosition(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f);
-        memoryInfo = new MemoryInfo(10);*/
+
 
         // default way to load a texture
         subImage = new Texture(Gdx.files.internal("sub.png"));
@@ -140,6 +143,13 @@ public class SubmarineGame extends ApplicationAdapter {
         // clear screen
         Gdx.gl.glClearColor(0.3f,0.1f, 0.9f, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) debug = !debug;
+
+        if (debug) {
+            debugCameraController.handleDebugInput(Gdx.graphics.getDeltaTime());
+            debugCameraController.applyTo(camera);
+        }
 
         hudViewport.apply();
         batch.setProjectionMatrix(hudViewport.getCamera().combined);
@@ -252,8 +262,15 @@ public class SubmarineGame extends ApplicationAdapter {
             font.draw(batch, "" + shellsCollectedScore, hudViewport.getWorldWidth() - 50, hudViewport.getWorldHeight() - 20);
             font.setColor(Color.GREEN);
             font.draw(batch, "" + subHealth, 20, hudViewport.getWorldHeight() - 20);
+
+            draw();
         }
+
         batch.end();
+
+        if (debug) {
+            renderDebug();
+        }
 
     }
 

@@ -1,6 +1,7 @@
 package si.um.feri.ObjectSubmarine;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.Iterator;
@@ -98,6 +99,9 @@ public class WorldRender {
             for (Iterator<Shark> itShark = world.sharks.iterator(); itShark.hasNext(); ) {
                 Shark shark = itShark.next();
                 if (torpedo.overlaps(shark)) {
+                    ParticleEffectPool.PooledEffect explosion = Assets.explosionPool.obtain();
+                    explosion.setPosition(shark.x, shark.y);
+                    Assets.effects.add(explosion);
                     shark.free();
                     it.remove();
                     itShark.remove();

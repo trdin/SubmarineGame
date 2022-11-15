@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -87,11 +88,25 @@ public class World {
         // coordinate system specified by the camera
         batch.setProjectionMatrix(camera.combined);
 
+        Assets.bubbles.update(Gdx.graphics.getDeltaTime());
         // begin a new batch and draw the rocket, astronauts, asteroids
         batch.begin();
         {    // brackets added just for indent
 
+            for (int i = Assets.effects.size - 1; i >= 0; i--) {
+                ParticleEffectPool.PooledEffect effect = Assets.effects.get(i);
+                effect.draw(batch, Gdx.graphics.getDeltaTime());
+                if (effect.isComplete()) {
+                    effect.free();
+                    Assets.effects.removeIndex(i);
+                }
+            }
+
             sub.draw(batch);
+            if (!Assets.pause) {
+                sub.drawBubbles(batch);
+            }
+
             for (Shark shark : sharks) {
                 shark.draw(batch);
             }
@@ -101,7 +116,7 @@ public class World {
             for (Torpedo torpedo : torpedoes) {
                 torpedo.draw(batch);
             }
-            for(PowerUp powerUp: powerUps){
+            for (PowerUp powerUp : powerUps) {
                 powerUp.draw(batch);
             }
             font.setColor(Color.YELLOW);
@@ -114,12 +129,12 @@ public class World {
             }
         }
         batch.end();
-        if(debug){
+        if (debug) {
             drawDebug();
         }
     }
 
-    public void drawDebug(){
+    public void drawDebug() {
         debugCameraController.applyTo(camera);
         batch.begin();
         {
@@ -162,7 +177,7 @@ public class World {
             for (Torpedo torpedo : torpedoes) {
                 torpedo.drawDebug(shapeRenderer);
             }
-            for(PowerUp powerUp: powerUps){
+            for (PowerUp powerUp : powerUps) {
                 powerUp.drawDebug(shapeRenderer);
             }
             sub.drawDebug(shapeRenderer);
@@ -171,11 +186,11 @@ public class World {
     }
 
     public void spawnTorpedo() {
-        if(sub.getPower() &&  TimeUtils.nanoTime() - lastPowerUpTime > Assets.POWER_UP_LENGTH*3){
+        if (sub.getPower() && TimeUtils.nanoTime() - lastPowerUpTime > Assets.POWER_UP_LENGTH * 3) {
             sub.setPower(false);
         }
 
-        if (sub.getPower() && TimeUtils.nanoTime() - lastTorpedoTime > 100000000 ) {
+        if (sub.getPower() && TimeUtils.nanoTime() - lastTorpedoTime > 100000000) {
             torpedoes.add(Torpedo.Companion.create(sub.x + Assets.subImage.getWidth() / 2f, sub.y + Assets.subImage.getHeight() / 2f));
             lastTorpedoTime = TimeUtils.nanoTime();
         }
@@ -243,7 +258,7 @@ public class World {
         shellsCollectedScore = 0;
 
         lastPowerUpTime = TimeUtils.nanoTime();
-        Assets.POWER_UP_TIME =  2000000000;
+        Assets.POWER_UP_TIME = 2000000000;
         Assets.TOP_SPEED_SHARK = 150;
         Assets.LOW_SPEED_SHARK = 50;
 
@@ -257,7 +272,7 @@ public class World {
         for (Torpedo torpedo : torpedoes) {
             torpedo.free();
         }
-        for(PowerUp powerUp: powerUps){
+        for (PowerUp powerUp : powerUps) {
             powerUp.free();
         }
 

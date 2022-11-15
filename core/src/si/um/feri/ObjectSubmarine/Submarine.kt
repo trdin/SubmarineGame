@@ -2,6 +2,7 @@ package si.um.feri.ObjectSubmarine
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector3
 
 class Submarine: PictureGameObject(Gdx.graphics.getWidth() / 2f, 20f, Assets.subImage) {
@@ -36,6 +37,15 @@ class Submarine: PictureGameObject(Gdx.graphics.getWidth() / 2f, 20f, Assets.sub
 
     fun powerUp(){
         power = true;
+    }
+
+    fun drawBubbles(batch: SpriteBatch){
+        Assets.bubbles.getEmitters().first().setPosition(x + width/2+7,y);
+        Assets.bubbles.draw(batch)
+        if (Assets.bubbles.isComplete()) {
+            Assets.bubbles.reset()
+        }
+
     }
 
     /*private void commandMoveLeft() {
