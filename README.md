@@ -1,4 +1,6 @@
-#Sumbamerine Game
+# Sumbamerine Game
+
+Build with LibGdx
 
 ## Game dynamics 
 
